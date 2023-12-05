@@ -1,26 +1,26 @@
 import re
 from collections import defaultdict
 
-def calc_mapping(i, source_start, dest_start):
+def calc_mapping(i, dest_start, source_start):
     return dest_start + (i - source_start)
 
 def solve(seeds, mappings, order):
+    locations = []
+
     for seed in seeds:
-
         val = seed
-
         for source_dest in order:
+            temp_cals = []
             src_dest_map = mappings[source_dest]
-            print(f'mapping {source_dest[0]} -> {source_dest[1]}')
             for source_range, src_dest_map_func in src_dest_map.items():
 
                 if source_range[0] <= val <= source_range[1]:
-                    print(f'value: {val} is in range: {source_range}')
-
                     val = src_dest_map_func(val)
-                    print(val)
-                    continue                    
-        break
+  
+        
+        locations.append(val)              
+
+    return min(locations)
 
 if __name__ == '__main__':
     with open('5/input.txt') as f:
@@ -42,7 +42,7 @@ if __name__ == '__main__':
             source_start = int(src_start)
             source_end = source_start + int(n) - 1
 
-            range_function = lambda i: calc_mapping(i, source_start, source_end)
+            range_function = lambda i, s=dest_start, e=source_start: calc_mapping(i, s, e)
 
             src_dest_mapping[(source_start, source_end)] = range_function
 
@@ -62,6 +62,4 @@ if __name__ == '__main__':
     seeds_p = r'^seeds:\s*([\s\d]+)'
     seeds = [int(n) for n in re.search(seeds_p, inp).group(1).strip().split(' ')]
 
-    solve(seeds, mappings, order)
-
-    # print(mappings[('seed', 'soil')][(50, 97)](50))
+    print(solve(seeds, mappings, order))
