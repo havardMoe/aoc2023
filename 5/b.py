@@ -52,7 +52,7 @@ def check_overlap(t, m):
 #               S-----------E
         else:
             overlap =  [t[0], m[1]]
-            outside2 = [m[0] + 1, t[1]]
+            outside2 = [m[1] + 1, t[1]]
 
 
     # start of t has to be after the map
@@ -171,3 +171,4 @@ if __name__ == '__main__':
 
     tuples = solve(seed_tuples, mappings, order)
     print(tuples)
+    print(min([min(t) for t in tuples]))
