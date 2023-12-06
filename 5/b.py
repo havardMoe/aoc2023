@@ -1,6 +1,9 @@
 import re
 from collections import defaultdict
 
+def find_min_tuple(tuples):
+    return min(min(t) for t in tuples)
+
 def check_overlap(t, m):
     # values inside the map
     overlap = None
@@ -62,20 +65,28 @@ def check_overlap(t, m):
     return overlap, outside1, outside2
 
 def solve(seed_tuples, mappings, order):
-    min_dist = 9999999999999999
+    current_min = 999999999999999999999
+
     for t in seed_tuples:
         start_seed, n = t
-        ranges = [(start_seed, start_seed + n)]
+        ranges = [(start_seed, start_seed + n - 1)]
         
         # Loop over a mapping, e.g. seed -> soil
         for source_dest in order:
             src_dest_map = mappings[source_dest]
             
-            mapped_ranges = []
-            unmapped_ranges = []
+            ranges_after_filtering = []
+            ranges_not_mapped = []
+
+            print('..........................................')
+            print(source_dest)
+            print(ranges)
+            print(src_dest_map)
+            print('..........................................')
 
             # Loop over a source range, e.g. source_range=(10, 20), delta=5
             for source_range, delta in src_dest_map.items():
+                
 
                 # Loop over all tuples
                 for r in ranges:
@@ -83,34 +94,42 @@ def solve(seed_tuples, mappings, order):
                     if overlap is not None:
                         overlap[0] += delta
                         overlap[1] += delta
-                        mapped_ranges.append(overlap)
+                        ranges_after_filtering.append(overlap)
 
                         if outside1 is not None:
-                            mapped_ranges.append(outside1)
+                            ranges_not_mapped.append(outside1)
                         
                         if outside2 is not None:
-                            mapped_ranges.append(outside2)
+                            ranges_not_mapped.append(outside2)
 
                     else:
-                        unmapped_ranges.append(r)
+                        ranges_not_mapped.append(r)
 
                 # Finished mapping a given range for a given source dest mapping
                 # This list will be looped over for the next range for the same source dest
-                ranges = unmapped_ranges.copy()  
-                
+                ranges = ranges_not_mapped.copy()
+                ranges_not_mapped = []
+
             # Finished source -> dest mapping
             # Preparing range list for next source, dest mapping
-            ranges = unmapped_ranges.copy()
-            ranges.extend(mapped_ranges.copy())
+            ranges.extend(ranges_after_filtering.copy())
+            ranges_after_filtering = []
+            ranges_not_mapped = []
+            # print(ranges)
 
-    return ranges
+        # Finished iterating over seed
+        # finding min:
+        min_seed = find_min_tuple(ranges)
+        if min_seed < current_min:
+            current_min = min_seed
+    return current_min
 
 
 def solve_old(seed_tuples, mappings, order):
     min_location = 99999999999999999
     for t in seed_tuples:
         start_seed, num_seeds = t
-        for seed in range(start_seed, start_seed + num_seeds):
+        for seed in range(start_seed, start_seed + num_seeds - 1):
             val = seed
             for source_dest in order:
                 src_dest_map = mappings[source_dest]
@@ -171,4 +190,5 @@ if __name__ == '__main__':
 
     tuples = solve(seed_tuples, mappings, order)
     print(tuples)
-    print(min([min(t) for t in tuples]))
+    # print(tuples)
+    # print(min([min(t) for t in tuples]))
