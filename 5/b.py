@@ -78,12 +78,6 @@ def solve(seed_tuples, mappings, order):
             ranges_after_filtering = []
             ranges_not_mapped = []
 
-            print('..........................................')
-            print(source_dest)
-            print(ranges)
-            print(src_dest_map)
-            print('..........................................')
-
             # Loop over a source range, e.g. source_range=(10, 20), delta=5
             for source_range, delta in src_dest_map.items():
                 
@@ -124,26 +118,6 @@ def solve(seed_tuples, mappings, order):
             current_min = min_seed
     return current_min
 
-
-def solve_old(seed_tuples, mappings, order):
-    min_location = 99999999999999999
-    for t in seed_tuples:
-        start_seed, num_seeds = t
-        for seed in range(start_seed, start_seed + num_seeds - 1):
-            val = seed
-            for source_dest in order:
-                src_dest_map = mappings[source_dest]
-                for source_range, src_dest_map_func in src_dest_map.items():
-
-                    if source_range[0] <= val <= source_range[1]:
-
-                        val = src_dest_map_func(val)
-                        break      
-            
-            if val < min_location:
-                min_location = val
-
-    return min_location
 
 if __name__ == '__main__':
     with open('5/input.txt') as f:
