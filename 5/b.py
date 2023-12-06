@@ -66,32 +66,43 @@ def solve(seed_tuples, mappings, order):
     for t in seed_tuples:
         start_seed, n = t
         ranges = [(start_seed, start_seed + n)]
-
+        
         # Loop over a mapping, e.g. seed -> soil
         for source_dest in order:
             src_dest_map = mappings[source_dest]
+            
+            mapped_ranges = []
+            unmapped_ranges = []
 
             # Loop over a source range, e.g. source_range=(10, 20), delta=5
             for source_range, delta in src_dest_map.items():
 
-                new_ranges = []
                 # Loop over all tuples
                 for r in ranges:
                     overlap, outside1, outside2 = check_overlap(r, source_range)
                     if overlap is not None:
-                        print('overlap')
-                        print(overlap)
                         overlap[0] += delta
                         overlap[1] += delta
-                        new_ranges.append(overlap)
-                    
-                    if outside1 is not None:
-                        new_ranges.append(outside1)
-                    
-                    if outside2 is not None:
-                        new_ranges.append(outside2)
+                        mapped_ranges.append(overlap)
+
+                        if outside1 is not None:
+                            mapped_ranges.append(outside1)
+                        
+                        if outside2 is not None:
+                            mapped_ranges.append(outside2)
+
+                    else:
+                        unmapped_ranges.append(r)
+
+                # Finished mapping a given range for a given source dest mapping
+                # This list will be looped over for the next range for the same source dest
+                ranges = unmapped_ranges.copy()  
                 
-                ranges = new_ranges
+            # Finished source -> dest mapping
+            # Preparing range list for next source, dest mapping
+            ranges = unmapped_ranges.copy()
+            ranges.extend(mapped_ranges.copy())
+
     return ranges
 
 
@@ -157,7 +168,6 @@ if __name__ == '__main__':
 
 
     seed_tuples = [(seeds[i], seeds[i + 1]) for i in range(0, len(seeds), 2)]
-    total_seeds = sum(t[1] for t in seed_tuples)
 
-    print(f'total seeds: {total_seeds}')
-    print(solve(seed_tuples, mappings, order))
+    tuples = solve(seed_tuples, mappings, order)
+    print(tuples)
