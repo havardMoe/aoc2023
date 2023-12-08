@@ -14,9 +14,8 @@ ZZZ = (ZZZ, ZZZ)
     
     inp = test_inp
 
-    directions_p = r'^([LR]+)'
-    direction = re.search(directions_p, inp).group(1)
+    directions_pattern = r'^([LR]+)'
+    direction = re.search(directions_pattern, inp).group(1)
 
-    print(direction)
-
+    node_pattern = r'\n'
     
