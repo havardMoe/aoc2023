@@ -40,6 +40,4 @@ if __name__ == '__main__':
         fill_pyramid_reverse(pyramid)
         next_numbers.append(pyramid[0][0])
     
-        # print(pyramid)
-
     print(sum(next_numbers))
