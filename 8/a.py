@@ -29,28 +29,22 @@ if __name__ == '__main__':
 
     maps = generate_maps(nodes)
 
-    steps = 0
-
-    # start node
-    node = nodes[0][0]
 
     i = 0
+    steps = 0
     n = len(direction)
-    while True:
-        if node == 'ZZZ':
-            break
-        else:
-            steps += 1
+
+    node = 'AAA'
+    while node != 'ZZZ':
+    
+        steps += 1
         
         d = direction[i % n]
+        node = go_left(maps, node) if d == 'L' else go_right(maps, node)
 
-        if d == 'L':
-            node = go_left(maps, node)
-        elif d == 'R':
-            node = go_right(maps, node)
+        i += 1
 
-    print(node)
-    print(f'steps: {steps}')
+    print(steps)
 
 
     
