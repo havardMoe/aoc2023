@@ -2,6 +2,7 @@ from enum import Enum
 import numpy as np
 from copy import deepcopy
 import sys
+import re
 
 sys.setrecursionlimit(20000) 
 
@@ -97,7 +98,7 @@ def get_valid_neighbour(maze: list[str], visits: list[bool], idx: list[int], d):
     return False, None
 
 
-def traverse_maze(loc, maze, visits, distances, steps=-1, root=False):
+def traverse_maze(loc, maze, visits, distances, steps=-1, path_history=None, root=False):
     steps += 1
 
     # set distance if it is lower than prev distance at location
@@ -105,6 +106,10 @@ def traverse_maze(loc, maze, visits, distances, steps=-1, root=False):
         distances[loc[0]][loc[1]] = steps
     # Update visits matrix
     visits[loc[0]][loc[1]] = True
+
+    if path_history is not None:
+        path_history.append(loc)
+
     # check for valid neighbours
     neighbours = get_valid_neighbours(maze, visits, loc)
 
@@ -119,9 +124,11 @@ def traverse_maze(loc, maze, visits, distances, steps=-1, root=False):
         visits2 = deepcopy(visits)
         distances1 = deepcopy(distances)
         distances2 = deepcopy(distances)
-        traverse_maze(neigh1, maze, visits1, distances1, steps)
+        # list keeping track of the coordinates making up the pipe
+        path_coordinates = [loc]#
+        traverse_maze(neigh1, maze, visits1, distances1, steps, path_history=path_coordinates)
         traverse_maze(neigh2, maze, visits2, distances2, steps)
-        return distances1, distances2
+        return path_coordinates, distances1, distances2
 
     # for each valid neighbour, call funciton recursively
     elif len(neighbours) == 0:
@@ -129,17 +136,43 @@ def traverse_maze(loc, maze, visits, distances, steps=-1, root=False):
     # is 1 neighbours when starting at the start location
     elif len(neighbours) == 1:
         neigh = neighbours[0]
-        traverse_maze(neigh, maze, visits, distances, steps)
+
+        traverse_maze(neigh, maze, visits, distances, steps, path_history=path_history)
     else:
         print(len(neighbours))
         raise ValueError(' there are too many neighbours ')
 
-def draw_pipes(inp):
+def draw_pipes(maze, coordinates):
+    pipes = [['.' for x in r] for r in maze]
+    for c in coordinates:
+        pipes[c[0]][c[1]] = maze[c[0]][c[1]]
+    return pipes
+
+# funciton to fill open locatoins in matrix
+def fill_outward(loc, pipes):
+    valid_neighbours = []
+
+def fill_pipes(pipes, c):
+    for i in range(len(pipes)):
+        for j in range(len(pipes[0])):
+            if pipes[i][j] == '.':
+                fill_outward((i, j), pipes, c)
+
+def print_map(pipes):
+    for r in pipes:
+        for c in r:
+            print(c, end='')
+        print()
+
+
+if __name__ == '__main__':
+    with open('10/input.txt') as f:
+        inp = [line.strip() for line in f]
     s = find_start(inp)
     
     visits = [[False for c in r] for r in inp]
     distances = [[np.inf for c in r] for r in inp]
-    distances1, distances2 = traverse_maze(
+    coordinates, d1, d2 = traverse_maze(
         loc=s,
         maze=inp,
         visits=visits,
@@ -147,28 +180,14 @@ def draw_pipes(inp):
         root=True
     )
 
-    pipes = []
-    for r1, r2 in zip(distances1, distances2):
-        pipe_row = ['X' if (d1 * d2 < np.inf) else '.' for (d1, d2) in zip(r1, r2)]
-        pipes.append(pipe_row)
-    
-    return pipes
+    pipes = draw_pipes(inp, coordinates)
+    print_map(pipes)
 
-def fill_outward(loc, pipes):
-    valid_neighbours = []
-def fill_pipes(pipes, c):
-    for i in range(len(pipes)):
-        for j in range(len(pipes[0])):
-            if pipes[i][j] == '.':
-                fill_outward((i, j), pipes, c)
+    for line in pipes:
+        line = "".join(line)
+        line = re.sub(r"L-*7", "|", line)
+        line = re.sub(r"L-*J", "||", line)
+        line = re.sub(r"F-*7", "||", line)
+        line = re.sub(r"F-*J", "|", line)
+        print(line)
 
-
-
-if __name__ == '__main__':
-    with open('10/input.txt') as f:
-        inp = [line.strip() for line in f]
-
-    pipes = draw_pipes(inp)
-
-    for r in pipes:
-        print(r)

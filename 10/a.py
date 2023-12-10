@@ -106,7 +106,6 @@ def traverse_maze(loc, maze, visits, distances, steps=-1, root=False):
     # Update visits matrix
     visits[loc[0]][loc[1]] = True
     # check for valid neighbours
-    print(loc)
     # print(visits[77][75], visits[78][75])
     neighbours = get_valid_neighbours(maze, visits, loc)
 
