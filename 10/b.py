@@ -183,7 +183,10 @@ if __name__ == '__main__':
     pipes = draw_pipes(inp, coordinates)
     print_map(pipes)
 
+    # one count each row
+    counts = []
     for line in pipes:
+        # little help from https://github.com/nitekat1124/advent-of-code-2023/blob/main/solutions/day10.py
         line = "".join(line)
         line = re.sub(r"L-*7", "|", line)
         line = re.sub(r"L-*J", "||", line)
@@ -191,3 +194,14 @@ if __name__ == '__main__':
         line = re.sub(r"F-*J", "|", line)
         print(line)
 
+        cross = 0
+        inside = 0
+
+        for c in line:
+            if c == "." and cross % 2:
+                inside += 1
+            elif c in "F7LJ|":
+                cross += 1
+        counts.append(inside)
+    print(sum(counts))
+    
