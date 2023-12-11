@@ -2,25 +2,24 @@ import re
 import numpy as np
 from itertools import combinations
 
-def fill_empty_space(space):
-    for _ in range(2):
-        new_space = []
-        for i in range(space.shape[0]):
-            if np.all(space[i] == 0):
-                for _ in range(1000000):
-                    new_space.append(space[i])
-            new_space.append(space[i])
-        space = np.array(new_space).T
-    return space
+def expand_coordinates(space, coordinates, n=999_999):
+    y, x = coordinates
 
-def print_nice(space):
-    for row in space:
-        for n in row:
-            if n == 0:
-                print('.', end='')
-            else:
-                print('#', end='')
-        print()
+    # modify the rows
+    dy = np.zeros(len(x))
+    for i in range(space.shape[0]):
+        if np.all(space[i] == 0):
+            dy = np.where(y > i, dy + n, dy)
+    
+    # modify the columns
+    dx = np.zeros(len(y))
+    for i in range(space.shape[1]):
+        if np.all(space[:,i] == 0):
+            dx = np.where(x > i, dx + n, dx)
+    
+    
+    coordinates = [(a, b) for a, b in zip(y + dy, x + dx)]
+    return coordinates
 
 
 if __name__ == '__main__':
@@ -29,9 +28,10 @@ if __name__ == '__main__':
     
     # 1s are gallaxies and 0s are empty space
     space = np.where(lines == '#', 1, 0)
-    space = fill_empty_space(space)
-    galaxy_coordinates = [(x, y) for x, y in zip(*np.nonzero(space))]
-    coordinate_combinations = combinations(galaxy_coordinates, r=2)
+
+    galaxy_coordinates = np.nonzero(space)
+    expanded_coordinates = expand_coordinates(space, galaxy_coordinates, n=999_999)
+    coordinate_combinations = combinations(expanded_coordinates, r=2)
     distances = [np.abs(np.array(pair[0]) - np.array(pair[1])).sum() for pair in coordinate_combinations]
 
-    print(sum(distances))
+    print(int(sum(distances)))
