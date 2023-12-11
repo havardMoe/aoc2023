@@ -7,7 +7,8 @@ def fill_empty_space(space):
         new_space = []
         for i in range(space.shape[0]):
             if np.all(space[i] == 0):
-                new_space.append(space[i])
+                for _ in range(1000000):
+                    new_space.append(space[i])
             new_space.append(space[i])
         space = np.array(new_space).T
     return space
