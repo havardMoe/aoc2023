@@ -11,16 +11,7 @@ def fill_empty_space(space):
             new_space.append(space[i])
         space = np.array(new_space).T
     return space
-
-def print_nice(space):
-    for row in space:
-        for n in row:
-            if n == 0:
-                print('.', end='')
-            else:
-                print('#', end='')
-        print()
-
+    
 
 if __name__ == '__main__':
     with open('11/input.txt') as f:

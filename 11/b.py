@@ -2,6 +2,7 @@ import re
 import numpy as np
 from itertools import combinations
 
+
 def expand_coordinates(space, coordinates, n=999_999):
     y, x = coordinates
 
@@ -16,7 +17,6 @@ def expand_coordinates(space, coordinates, n=999_999):
     for i in range(space.shape[1]):
         if np.all(space[:,i] == 0):
             dx = np.where(x > i, dx + n, dx)
-    
     
     coordinates = [(a, b) for a, b in zip(y + dy, x + dx)]
     return coordinates
